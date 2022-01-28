@@ -13,7 +13,38 @@
             <option v-for="line in lines" :key="line.id" value="placeholder">{{ line[0] }}</option>
         </select>
         <div id="lineArea">
-
+            <div class="route" v-if="firstRouteIsActive">
+                <div class="routeTitles" v-on:click="openRoute(0)">
+                    <span>{{ firstRouteFirstTitle }}</span>
+                    <span>{{ firstRouteSecondTitle }}</span>
+                </div>
+                <div>
+                    <div class="routeStop" v-for="[id, code, name] in firstRouteStops">
+                        <span class="routeStopName">
+                            {{ name[1] }}
+                        </span>
+                         <span class="routeStopCode">
+                             {{ code[1] }}
+                         </span>
+                    </div>
+                </div>
+            </div>
+            <div class="route" v-if="secondRouteIsActive">
+                <div class="routeTitles" v-on:click="openRoute(1)">
+                    <span>{{ secondRouteFirstTitle }}</span>
+                    <span>{{ secondRouteSecondTitle }}</span>
+                </div>
+                <div>
+                    <div class="routeStop" v-for="[id, code, name] in secondRouteStops">
+                        <span class="routeStopName">
+                            {{ name[1] }}
+                        </span>
+                        <span class="routeStopCode">
+                             {{ code[1] }}
+                         </span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -25,6 +56,14 @@ export default {
         return {
             currentTypeId: null,
             lines: [],
+            firstRouteIsActive: false,
+            firstRouteFirstTitle: null,
+            firstRouteSecondTitle: null,
+            firstRouteStops: [],
+            secondRouteIsActive: false,
+            secondRouteFirstTitle: null,
+            secondRouteSecondTitle: null,
+            secondRouteStops: [],
         }
     },
     methods: {
@@ -69,8 +108,33 @@ export default {
             // start rendering the data on the page
             let lineId = document.getElementById("linesSelect").value
             this.getLineFromApi(lineId).then(response => response.json()).then(data => {
-                // TODO render data on the page
+                // render first route
+                this.firstRouteFirstTitle = data["routes"][0]["stops"][0]["name"]
+                this.firstRouteSecondTitle = data["routes"][0]["stops"][data["routes"][0]["stops"].length - 1]["name"]
+                for (let i = 0; i < data["routes"][0]["stops"].length; i++) {
+                    let currStop = new Map()
+                    currStop.set("id", data["routes"][0]["stops"][i]["id"])
+                    currStop.set("code", data["routes"][0]["stops"][i]["code"])
+                    currStop.set("name", data["routes"][0]["stops"][i]["name"])
+                    this.firstRouteStops[i] = currStop
+                }
+                this.firstRouteIsActive = true
+
+                // render second route
+                this.secondRouteFirstTitle= data["routes"][1]["stops"][0]["name"]
+                this.secondRouteSecondTitle= data["routes"][1]["stops"][data["routes"][1]["stops"].length - 1]["name"]
+                for (let i = 0; i < data["routes"][1]["stops"].length; i++) {
+                    let currStop = new Map()
+                    currStop.set("id", data["routes"][1]["stops"][i]["id"])
+                    currStop.set("code", data["routes"][1]["stops"][i]["code"])
+                    currStop.set("name", data["routes"][1]["stops"][i]["name"])
+                    this.secondRouteStops[i] = currStop
+                }
+                this.secondRouteIsActive= true
             })
+        },
+        openRoute: function (routeId) {
+            console.log(routeId)
         },
         getLinesFromApi: function (typeId) {
             const url = "http://localhost:8080/v3/lines/" + typeId;
@@ -101,6 +165,7 @@ export default {
 <style scoped>
 #linesComponentArea {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     width: 80%;
     margin: auto;
@@ -118,9 +183,10 @@ export default {
 
 #typesList {
     display: none;
+    position: absolute;
     list-style: none;
     text-align: left;
-    background: grey;
+    background: lightgray;
     margin: 0;
     padding: 0;
 }
@@ -132,5 +198,45 @@ export default {
 #linesSelect {
     height: 2rem;
     width: 8rem;
+}
+
+.route {
+    display: flex;
+    flex-direction: column;
+    padding-top: 1rem;
+}
+
+.routeTitles {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 5rem;
+    width: 97vw;
+    background: grey;
+}
+
+.routeStop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 3rem;
+    width: 97vw;
+    background: lightgray;
+}
+
+.routeStopName {
+    font-size: 18px;
+    text-align: center;
+    margin: auto;
+    max-width: 16rem;
+}
+
+.routeStopCode {
+    text-align: center;
+    width: 3rem;
+    margin-right: 0.5rem;
+    color: #d2d2d2;
+    background: #414141;
 }
 </style>

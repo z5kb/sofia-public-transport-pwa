@@ -1,8 +1,8 @@
 <template>
     <div id="stopArea">
         <div id="searchArea">
-            <input v-model="stopId">
-            <button v-on:click="render_data(stopId)" type="button">Search</button>
+            <input v-model.lazy="stopId">
+            <button id="searchButton" @click="render_data(stopId)" type="button">Search</button>
         </div>
         <p id="stopName"></p>
         <div id="linesComponentArea">
@@ -21,9 +21,12 @@
 <script>
 export default {
     name: "Stop",
+    props: {
+        stopIdFromLinesComponent: Number,
+    },
     data() {
         return {
-            stopId: null,
+            stopId: this.stopIdFromLinesComponent,
             lines: [],
         }
     },

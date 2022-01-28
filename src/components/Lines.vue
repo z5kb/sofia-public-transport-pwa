@@ -1,41 +1,41 @@
 <template>
     <div id="linesComponentArea">
         <div id="selectTypeDiv">
-            <button id="typesButton" v-on:click="toggleSelectionDropdown('typesList')">Select a type</button>
+            <button id="typesButton" @click="toggleSelectionDropdown('typesList')">Select a type</button>
             <ul id="typesList" style="display: none">
-                <li v-on:click="loadType(1, 'Buses')">Buses</li>
-                <li v-on:click="loadType(2, 'Trolleys')">Trolleys</li>
-                <li v-on:click="loadType(0, 'Trams')">Trams</li>
+                <li @click="loadType(1, 'Buses')">Buses</li>
+                <li @click="loadType(2, 'Trolleys')">Trolleys</li>
+                <li @click="loadType(0, 'Trams')">Trams</li>
             </ul>
         </div>
-        <select id="linesSelect" v-on:change="loadLine()">
+        <select id="linesSelect" @change="loadLine()">
             <option selected disabled hidden>Select a line</option>
             <option v-for="line in lines" :key="line.id" value="placeholder">{{ line[0] }}</option>
         </select>
         <div id="lineArea">
             <div class="route" v-if="firstRouteIsActive">
-                <div class="routeTitles" v-on:click="openRoute(0)">
+                <div class="routeTitles">
                     <span>{{ firstRouteFirstTitle }}</span>
                     <span>{{ firstRouteSecondTitle }}</span>
                 </div>
                 <div>
-                    <div class="routeStop" v-for="[id, code, name] in firstRouteStops">
+                    <div class="routeStop" v-for="[id, code, name] in firstRouteStops" @click="$emit('load-stop', code)">
                         <span class="routeStopName">
                             {{ name[1] }}
                         </span>
-                         <span class="routeStopCode">
+                        <span class="routeStopCode">
                              {{ code[1] }}
                          </span>
                     </div>
                 </div>
             </div>
             <div class="route" v-if="secondRouteIsActive">
-                <div class="routeTitles" v-on:click="openRoute(1)">
+                <div class="routeTitles">
                     <span>{{ secondRouteFirstTitle }}</span>
                     <span>{{ secondRouteSecondTitle }}</span>
                 </div>
                 <div>
-                    <div class="routeStop" v-for="[id, code, name] in secondRouteStops">
+                    <div class="routeStop" v-for="[id, code, name] in secondRouteStops" @click="$emit('load-stop', code)">
                         <span class="routeStopName">
                             {{ name[1] }}
                         </span>
@@ -132,9 +132,6 @@ export default {
                 }
                 this.secondRouteIsActive= true
             })
-        },
-        openRoute: function (routeId) {
-            console.log(routeId)
         },
         getLinesFromApi: function (typeId) {
             const url = "http://localhost:8080/v3/lines/" + typeId;

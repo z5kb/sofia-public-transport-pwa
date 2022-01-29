@@ -65,6 +65,9 @@ export default {
     display: flex;
     justify-content: space-between;
     padding-bottom: 1rem;
+    min-width: 22rem;
+    max-width: 30rem;
+    margin: auto;
 }
 
 .navbar-icon {

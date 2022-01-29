@@ -1,11 +1,11 @@
 <template>
     <div id="stopArea">
         <div id="searchArea">
-            <input v-model="stopId">
-            <button v-on:click="render_data(stopId)" type="button">Search</button>
+            <input v-model.lazy="stopId">
+            <button id="searchButton" @click="render_data(stopId)" type="button">Search</button>
         </div>
         <p id="stopName"></p>
-        <div id="linesArea">
+        <div id="linesComponentArea">
             <div id="lineArea" v-for="line in lines" :key="line.id">
                 <p>{{ line[0] }}</p>
                 <div id="lineTimes">
@@ -21,39 +21,43 @@
 <script>
 export default {
     name: "Stop",
+    props: {
+        stopIdFromLinesComponent: Number,
+    },
     data() {
         return {
-            stopId: null,
+            stopId: this.stopIdFromLinesComponent,
             lines: [],
         }
     },
     methods: {
         render_data: function (stopId) {
+            this.get_data_from_api(stopId).then(response => response.json().then(data => {
+                // clear rendered components (if any)
+                this.lines = []
 
-            this.get_data_from_api(stopId)
-                .then(response => response.json().then(data => {
-                    // clear rendered components (if any)
-                    this.lines = []
+                // change stop name
+                document.getElementById("stopName").innerHTML = data["name"]
 
-                    // change stop name
-                    document.getElementById("stopName").innerHTML = data["name"]
-
-                    // iterate the data from the API and make a nested array with the names and the times of the lines
-                    for (let i = 0; i < data["lines"].length; i++) {
-                        let lineName = data["lines"][i]["name"]
-                        let lineTimes = []
-                        for (let j = 0; j < data["lines"][i]["times"].length; j++) {
-                            lineTimes[j] = data["lines"][i]["times"][j]["time"]
-                        }
-
-                        if (lineName.length === 1) {
-                            lineName = "  " + lineName
-                        } else if (lineName.length === 2) {
-                            lineName = " " + lineName
-                        }
-                        this.lines[i] = [lineName, lineTimes]
+                // iterate the data from the API and make a nested array with the names and the times of the lines
+                for (let i = 0; i < data["lines"].length; i++) {
+                    let lineName = data["lines"][i]["name"]
+                    let lineTimes = []
+                    for (let j = 0; j < data["lines"][i]["times"].length; j++) {
+                        lineTimes[j] = data["lines"][i]["times"][j]["time"]
                     }
-                }));
+
+                    // add spaces so the names are aligned properly on the html page
+                    if (lineName.length === 1) {
+                        lineName = "  " + lineName
+                    } else if (lineName.length === 2) {
+                        lineName = " " + lineName
+                    }
+
+                    // append current line to the "lines" array
+                    this.lines[i] = [lineName, lineTimes]
+                }
+            }));
         },
         get_data_from_api: function (stopId) {
             const url = "http://localhost:8080/v3/stops/" + stopId;
@@ -87,7 +91,7 @@ export default {
     height: 1.3rem;
 }
 
-#linesArea {
+#linesComponentArea {
     display: flex;
     flex-direction: column;
 }

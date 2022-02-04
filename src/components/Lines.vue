@@ -1,5 +1,5 @@
 <template>
-    <div id="linesComponentArea">
+    <div id="stopMainContent">
         <div id="selectTypeDiv">
             <button id="typesButton" @click="toggleSelectionDropdown('typesList')">Select a type</button>
             <ul id="typesList" style="display: none">
@@ -12,7 +12,7 @@
             <option selected disabled hidden>Select a line</option>
             <option v-for="line in lines" :key="line.id" value="placeholder">{{ line[0] }}</option>
         </select>
-        <div id="lineArea">
+        <div id="line">
             <div class="route" v-if="firstRouteIsActive">
                 <div class="routeTitles">
                     <span>{{ firstRouteFirstTitle }}</span>
@@ -134,7 +134,7 @@ export default {
             })
         },
         getLinesFromApi: function (typeId) {
-            const url = "http://localhost:8080/v3/lines/" + typeId;
+            const url = "http://localhost:8080/api/v3/lines/" + typeId;
             const headers = {
                 "x-api-key": "fudeqogehuxazisaqubojawerulaciquxofilibupetirimu",
                 "x-user-id": "0c8ceb98-aea8-4f47-8fb1-cc5c63abf379",
@@ -145,7 +145,7 @@ export default {
                 .then(data => data);
         },
         getLineFromApi: function (lineId) {
-            const url = "http://localhost:8080/v3/lines/" + this.currentTypeId + "/" + lineId;
+            const url = "http://localhost:8080/api/v3/lines/" + this.currentTypeId + "/" + lineId;
             const headers = {
                 "x-api-key": "fudeqogehuxazisaqubojawerulaciquxofilibupetirimu",
                 "x-user-id": "0c8ceb98-aea8-4f47-8fb1-cc5c63abf379",
@@ -160,7 +160,7 @@ export default {
 </script>
 
 <style scoped>
-#linesComponentArea {
+#stopMainContent {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;

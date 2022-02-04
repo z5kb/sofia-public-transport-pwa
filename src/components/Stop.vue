@@ -1,12 +1,16 @@
 <template>
     <div id="stopArea">
-        <div id="searchArea">
-            <input v-model.lazy="stopId">
-            <button id="searchButton" @click="render_data(stopId)" type="button">Search</button>
+        <div id="search">
+            <input v-model="stopCode">
+            <button id="searchButton" @click="renderData" type="button">Search</button>
         </div>
-        <p id="stopName"></p>
-        <div id="linesComponentArea">
-            <div id="lineArea" v-for="line in lines" :key="line.id">
+        <div id="stopHeader">
+            {{ stopName }}
+            <img alt="addStopToFavsIcon" v-if="!stopIsFav && stopIsFav !== null" @click="addStopToFavs()" class="heartIcon" src="../assets/navigation-bar/favourite-heart@48x48.svg">
+            <img alt="removeStopFromFavsIcon" v-if="stopIsFav && stopIsFav !== null" @click="removeStopFromFavs()" class="heartIcon" src="../assets/navigation-bar/alerts@48x48.svg">
+        </div>
+        <div id="stopMainContent">
+            <div id="line" v-for="line in lines" :key="line.id">
                 <p>{{ line[0] }}</p>
                 <div id="lineTimes">
                     <div v-for="lineTime in line[1]">
@@ -19,32 +23,46 @@
 </template>
 
 <script>
+import Localbase from "localbase"
+
 export default {
     name: "Stop",
     props: {
-        stopIdFromLinesComponent: Number,
+        stopCodeFromLinesComponent: Number,
     },
     data() {
         return {
-            stopId: this.stopIdFromLinesComponent,
+            stopCode: this.stopCodeFromLinesComponent,
+            stopName: null,
+            stopIsFav: null,
             lines: [],
+            db: new Localbase("db"),
         }
     },
     methods: {
-        render_data: function (stopId) {
-            this.get_data_from_api(stopId).then(response => response.json().then(data => {
-                // clear rendered components (if any)
+        renderData: function () {
+            this.getDataFromAPI(this.stopCode).then(response => response.json().then(data => {
+                // clear any rendered lines
                 this.lines = []
 
-                // change stop name
-                document.getElementById("stopName").innerHTML = data["name"]
+                // update header
+                this.stopName = data["name"]
+                this.updateStopIsFav()
 
                 // iterate the data from the API and make a nested array with the names and the times of the lines
                 for (let i = 0; i < data["lines"].length; i++) {
                     let lineName = data["lines"][i]["name"]
                     let lineTimes = []
-                    for (let j = 0; j < data["lines"][i]["times"].length; j++) {
-                        lineTimes[j] = data["lines"][i]["times"][j]["time"]
+
+                    // limit the lines' times to 5 (so they render properly on the screen)
+                    if (data["lines"][i]["times"].length > 5) {
+                        for (let j = 0; j < 5; j++) {
+                            lineTimes[j] = data["lines"][i]["times"][j]["time"]
+                        }
+                    } else {
+                        for (let j = 0; j < data["lines"][i]["times"].length; j++) {
+                            lineTimes[j] = data["lines"][i]["times"][j]["time"]
+                        }
                     }
 
                     // add spaces so the names are aligned properly on the html page
@@ -59,8 +77,8 @@ export default {
                 }
             }));
         },
-        get_data_from_api: function (stopId) {
-            const url = "http://localhost:8080/v3/stops/" + stopId;
+        getDataFromAPI: function () {
+            const url = "http://localhost:8080/api/v3/stops/" + this.stopCode;
             const headers = {
                 "x-api-key": "fudeqogehuxazisaqubojawerulaciquxofilibupetirimu",
                 "x-user-id": "0c8ceb98-aea8-4f47-8fb1-cc5c63abf379",
@@ -69,6 +87,28 @@ export default {
             return fetch(url, {headers})
                 .then(response => response)
                 .then(data => data);
+        },
+        addStopToFavs: function () {
+            this.db.collection("FavouriteStops").add({
+                code: this.stopCode,
+                name: this.stopName,
+            }).then(response => this.updateStopIsFav())
+        },
+        removeStopFromFavs: function () {
+            this.db.collection("FavouriteStops").doc({
+                code: this.stopCode
+            }).delete().then(response => this.updateStopIsFav())
+        },
+        updateStopIsFav: function () {
+            this.db.collection("FavouriteStops").get().then(data => {
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i]["code"] === this.stopCode) {
+                        this.stopIsFav = true
+                        return
+                    }
+                }
+                this.stopIsFav = false
+            })
         },
     },
 }
@@ -81,22 +121,31 @@ export default {
     align-items: center;
 }
 
-#searchArea {
+#search {
     display: flex;
     align-items: center;
 }
 
-#searchArea button {
+#search button {
     width: 4rem;
     height: 1.3rem;
 }
 
-#linesComponentArea {
+#stopHeader {
+    display: flex;
+}
+
+.heartIcon {
+    width: 1rem;
+    height: 1rem;
+}
+
+#stopMainContent {
     display: flex;
     flex-direction: column;
 }
 
-#lineArea {
+#line {
     display: flex;
     align-items: center;
     column-gap: 1rem;
@@ -105,7 +154,7 @@ export default {
     background: grey
 }
 
-#lineArea p {
+#line p {
     font-size: 2rem;
     font-weight: bold;
     margin: 1rem 1rem 1rem 1rem

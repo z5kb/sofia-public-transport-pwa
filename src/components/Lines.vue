@@ -105,6 +105,10 @@ export default {
             })
         },
         loadLine: function () {
+            // remove any previously rendered stops
+            this.firstRouteStops = []
+            this.secondRouteStops = []
+
             // start rendering the data on the page
             let lineId = document.getElementById("linesSelect").value
             this.getLineFromApi(lineId).then(response => response.json()).then(data => {

@@ -7,8 +7,8 @@
             <img @click="renderChangesComponent()" class="navbarIcon" alt="alerts-icon" src="../assets/navigation-bar/alerts@48x48.svg">
             <img class="navbarIcon" alt="settings-icon" src="../assets/navigation-bar/settings@48x48.svg">
         </div>
-        <Stop v-if="stopIsActive" v-bind:stopIdFromLinesComponent="stopId"></Stop>
-        <Favourites v-if="favouritesIsActive"></Favourites>
+        <Stop v-if="stopIsActive" v-bind:stopCodeFromAnotherComponent="stopId"></Stop>
+        <Favourites v-if="favouritesIsActive" @load-stop="loadStop"></Favourites>
         <Lines v-if="linesIsActive" @load-stop="loadStop"></Lines>
         <Changes v-if="changesIsActive"></Changes>
     </div>
@@ -39,8 +39,9 @@ export default {
     },
     methods: {
         loadStop: function (stopId) {
+            console.log(typeof stopId)
             this.renderStopComponent()
-            this.stopId = stopId[1]
+            this.stopId = stopId
         },
         renderStopComponent: function () {
             this.clearRenderedComponents()

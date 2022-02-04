@@ -19,11 +19,11 @@
                     <span>{{ firstRouteSecondTitle }}</span>
                 </div>
                 <div>
-                    <div class="routeStop" v-for="[id, code, name] in firstRouteStops" @click="$emit('load-stop', code)">
-                        <span class="routeStopName">
+                    <div class="stop" v-for="[id, code, name] in firstRouteStops" @click="$emit('load-stop', String(code[1]))">
+                        <span class="stopName">
                             {{ name[1] }}
                         </span>
-                        <span class="routeStopCode">
+                        <span class="stopCode">
                              {{ code[1] }}
                          </span>
                     </div>
@@ -35,11 +35,11 @@
                     <span>{{ secondRouteSecondTitle }}</span>
                 </div>
                 <div>
-                    <div class="routeStop" v-for="[id, code, name] in secondRouteStops" @click="$emit('load-stop', code)">
-                        <span class="routeStopName">
+                    <div class="stop" v-for="[id, code, name] in secondRouteStops" @click="$emit('load-stop', String(code[1]))">
+                        <span class="stopName">
                             {{ name[1] }}
                         </span>
-                        <span class="routeStopCode">
+                        <span class="stopCode">
                              {{ code[1] }}
                          </span>
                     </div>
@@ -213,7 +213,7 @@ export default {
     background: grey;
 }
 
-.routeStop {
+.stop {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -222,14 +222,14 @@ export default {
     background: lightgray;
 }
 
-.routeStopName {
+.stopName {
     font-size: 18px;
     text-align: center;
     margin: auto;
     max-width: 16rem;
 }
 
-.routeStopCode {
+.stopCode {
     text-align: center;
     width: 3rem;
     margin-right: 0.5rem;

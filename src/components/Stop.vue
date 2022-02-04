@@ -5,9 +5,9 @@
             <button id="searchButton" @click="renderData" type="button">Search</button>
         </div>
         <div id="stopHeader">
-            {{ stopName }}
-            <img alt="addStopToFavsIcon" v-if="!stopIsFav && stopIsFav !== null" @click="addStopToFavs()" class="heartIcon" src="../assets/navigation-bar/favourite-heart@48x48.svg">
-            <img alt="removeStopFromFavsIcon" v-if="stopIsFav && stopIsFav !== null" @click="removeStopFromFavs()" class="heartIcon" src="../assets/navigation-bar/alerts@48x48.svg">
+            <a>{{ stopName }}</a>
+            <img alt="addStopToFavsIcon" v-if="!stopIsFav && stopIsFav !== null" @click="addStopToFavs()" class="icon" src="../assets/navigation-bar/favourite-heart@48x48.svg">
+            <img alt="removeStopFromFavsIcon" v-if="stopIsFav && stopIsFav !== null" @click="removeStopFromFavs()" class="icon" src="../assets/navigation-bar/alerts@48x48.svg">
         </div>
         <div id="stopMainContent">
             <div id="line" v-for="line in lines" :key="line.id">
@@ -28,15 +28,22 @@ import Localbase from "localbase"
 export default {
     name: "Stop",
     props: {
-        stopCodeFromLinesComponent: Number,
+        stopCodeFromAnotherComponent: String,
     },
     data() {
         return {
-            stopCode: this.stopCodeFromLinesComponent,
+            stopCode: this.stopCodeFromAnotherComponent,
             stopName: null,
             stopIsFav: null,
             lines: [],
             db: new Localbase("db"),
+        }
+    },
+    mounted() {
+        // check if another component is trying to load a stop
+        if (this.stopCode !== null) {
+            this.updateStopIsFav()
+            document.getElementById("searchButton").click()
         }
     },
     methods: {
@@ -90,19 +97,19 @@ export default {
         },
         addStopToFavs: function () {
             this.db.collection("FavouriteStops").add({
-                code: this.stopCode,
+                code: String(this.stopCode),
                 name: this.stopName,
             }).then(response => this.updateStopIsFav())
         },
         removeStopFromFavs: function () {
             this.db.collection("FavouriteStops").doc({
-                code: this.stopCode
+                code: String(this.stopCode)
             }).delete().then(response => this.updateStopIsFav())
         },
         updateStopIsFav: function () {
             this.db.collection("FavouriteStops").get().then(data => {
                 for (let i = 0; i < data.length; i++) {
-                    if (data[i]["code"] === this.stopCode) {
+                    if (data[i]["code"] === String(this.stopCode)) {
                         this.stopIsFav = true
                         return
                     }
@@ -133,11 +140,15 @@ export default {
 
 #stopHeader {
     display: flex;
+    font-size: 20px;
+    align-items: center;
+    justify-content: center;
 }
 
-.heartIcon {
+.icon {
     width: 1rem;
     height: 1rem;
+    padding: 1rem;
 }
 
 #stopMainContent {
@@ -149,7 +160,6 @@ export default {
     display: flex;
     align-items: center;
     column-gap: 1rem;
-
     width: 97vw;
     background: grey
 }

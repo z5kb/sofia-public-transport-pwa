@@ -13,7 +13,7 @@
             <div id="line" v-for="line in lines" :key="line.id">
                 <p>{{ line[0] }}</p>
                 <div id="lineTimes">
-                    <div v-for="lineTime in line[1]">
+                    <div v-for="lineTime in line[1]" :key="lineTime.id">
                         {{ lineTime }}
                     </div>
                 </div>
@@ -99,12 +99,12 @@ export default {
             this.db.collection("FavouriteStops").add({
                 code: String(this.stopCode),
                 name: this.stopName,
-            }).then(response => this.updateStopIsFav())
+            }).then(() => this.updateStopIsFav())
         },
         removeStopFromFavs: function () {
             this.db.collection("FavouriteStops").doc({
                 code: String(this.stopCode)
-            }).delete().then(response => this.updateStopIsFav())
+            }).delete().then(() => this.updateStopIsFav())
         },
         updateStopIsFav: function () {
             this.db.collection("FavouriteStops").get().then(data => {

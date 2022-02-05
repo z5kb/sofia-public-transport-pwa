@@ -85,7 +85,7 @@ export default {
             }));
         },
         getDataFromAPI: function () {
-            const url = "http://localhost:8080/api/v3/stops/" + this.stopCode;
+            const url = "http://localhost:8080/one/v3/stops/" + this.stopCode;
             const headers = {
                 "x-api-key": "fudeqogehuxazisaqubojawerulaciquxofilibupetirimu",
                 "x-user-id": "0c8ceb98-aea8-4f47-8fb1-cc5c63abf379",

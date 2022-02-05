@@ -138,7 +138,7 @@ export default {
             })
         },
         getLinesFromApi: function (typeId) {
-            const url = "http://localhost:8080/api/v3/lines/" + typeId;
+            const url = "http://localhost:8080/one/v3/lines/" + typeId;
             const headers = {
                 "x-api-key": "fudeqogehuxazisaqubojawerulaciquxofilibupetirimu",
                 "x-user-id": "0c8ceb98-aea8-4f47-8fb1-cc5c63abf379",
@@ -149,7 +149,7 @@ export default {
                 .then(data => data);
         },
         getLineFromApi: function (lineId) {
-            const url = "http://localhost:8080/api/v3/lines/" + this.currentTypeId + "/" + lineId;
+            const url = "http://localhost:8080/one/v3/lines/" + this.currentTypeId + "/" + lineId;
             const headers = {
                 "x-api-key": "fudeqogehuxazisaqubojawerulaciquxofilibupetirimu",
                 "x-user-id": "0c8ceb98-aea8-4f47-8fb1-cc5c63abf379",

@@ -1,5 +1,5 @@
 <template>
-    <div id="linesComponentArea">
+    <div id="stopMainContent">
         <div id="selectTypeDiv">
             <button id="typesButton" @click="toggleSelectionDropdown('typesList')">Select a type</button>
             <ul id="typesList" style="display: none">
@@ -12,18 +12,18 @@
             <option selected disabled hidden>Select a line</option>
             <option v-for="line in lines" :key="line.id" value="placeholder">{{ line[0] }}</option>
         </select>
-        <div id="lineArea">
+        <div id="line">
             <div class="route" v-if="firstRouteIsActive">
                 <div class="routeTitles">
                     <span>{{ firstRouteFirstTitle }}</span>
                     <span>{{ firstRouteSecondTitle }}</span>
                 </div>
                 <div>
-                    <div class="routeStop" v-for="[id, code, name] in firstRouteStops" @click="$emit('load-stop', code)">
-                        <span class="routeStopName">
+                    <div class="stop" v-for="[id, code, name] in firstRouteStops" @click="$emit('load-stop', String(code[1]))">
+                        <span class="stopName">
                             {{ name[1] }}
                         </span>
-                        <span class="routeStopCode">
+                        <span class="stopCode">
                              {{ code[1] }}
                          </span>
                     </div>
@@ -35,11 +35,11 @@
                     <span>{{ secondRouteSecondTitle }}</span>
                 </div>
                 <div>
-                    <div class="routeStop" v-for="[id, code, name] in secondRouteStops" @click="$emit('load-stop', code)">
-                        <span class="routeStopName">
+                    <div class="stop" v-for="[id, code, name] in secondRouteStops" @click="$emit('load-stop', String(code[1]))">
+                        <span class="stopName">
                             {{ name[1] }}
                         </span>
-                        <span class="routeStopCode">
+                        <span class="stopCode">
                              {{ code[1] }}
                          </span>
                     </div>
@@ -105,6 +105,10 @@ export default {
             })
         },
         loadLine: function () {
+            // remove any previously rendered stops
+            this.firstRouteStops = []
+            this.secondRouteStops = []
+
             // start rendering the data on the page
             let lineId = document.getElementById("linesSelect").value
             this.getLineFromApi(lineId).then(response => response.json()).then(data => {
@@ -134,7 +138,7 @@ export default {
             })
         },
         getLinesFromApi: function (typeId) {
-            const url = "http://localhost:8080/v3/lines/" + typeId;
+            const url = "http://localhost:8080/one/v3/lines/" + typeId;
             const headers = {
                 "x-api-key": "fudeqogehuxazisaqubojawerulaciquxofilibupetirimu",
                 "x-user-id": "0c8ceb98-aea8-4f47-8fb1-cc5c63abf379",
@@ -145,7 +149,7 @@ export default {
                 .then(data => data);
         },
         getLineFromApi: function (lineId) {
-            const url = "http://localhost:8080/v3/lines/" + this.currentTypeId + "/" + lineId;
+            const url = "http://localhost:8080/one/v3/lines/" + this.currentTypeId + "/" + lineId;
             const headers = {
                 "x-api-key": "fudeqogehuxazisaqubojawerulaciquxofilibupetirimu",
                 "x-user-id": "0c8ceb98-aea8-4f47-8fb1-cc5c63abf379",
@@ -160,7 +164,7 @@ export default {
 </script>
 
 <style scoped>
-#linesComponentArea {
+#stopMainContent {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -213,7 +217,7 @@ export default {
     background: grey;
 }
 
-.routeStop {
+.stop {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -222,14 +226,14 @@ export default {
     background: lightgray;
 }
 
-.routeStopName {
+.stopName {
     font-size: 18px;
     text-align: center;
     margin: auto;
     max-width: 16rem;
 }
 
-.routeStopCode {
+.stopCode {
     text-align: center;
     width: 3rem;
     margin-right: 0.5rem;

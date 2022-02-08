@@ -1,7 +1,7 @@
 <template>
     <div id="mainContent">
         <p id="noStopsPlaceholder" v-if="stops.length === 0">You don't have any favourite stops :(</p>
-        <div class="stop" v-for="stop in stops">
+        <div class="stop" v-for="stop in stops" :key="stop.id">
             <div class="stopData" @click="$emit('load-stop', stop['code'])">
                 <span class="stopName">
                     {{ stop["name"] }}
@@ -16,6 +16,7 @@
 </template>
 
 <script>
+// an IndexedDB library
 import Localbase from "localbase"
 
 export default {
@@ -41,7 +42,7 @@ export default {
         },
         removeStop: function (stopCode) {
             console.log(stopCode)
-            this.db.collection("FavouriteStops").doc({code: stopCode}).delete().then(response => this.renderStops())
+            this.db.collection("FavouriteStops").doc({code: stopCode}).delete().then(() => this.renderStops())
         }
     }
 }

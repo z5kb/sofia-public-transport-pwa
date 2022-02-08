@@ -19,7 +19,7 @@
                     <span>{{ firstRouteSecondTitle }}</span>
                 </div>
                 <div>
-                    <div class="stop" v-for="[id, code, name] in firstRouteStops" @click="$emit('load-stop', String(code[1]))">
+                    <div class="stop" v-for="[code, name] in firstRouteStops" :key="[code.id, name.id]" @click="$emit('load-stop', String(code[1]))">
                         <span class="stopName">
                             {{ name[1] }}
                         </span>
@@ -35,7 +35,7 @@
                     <span>{{ secondRouteSecondTitle }}</span>
                 </div>
                 <div>
-                    <div class="stop" v-for="[id, code, name] in secondRouteStops" @click="$emit('load-stop', String(code[1]))">
+                    <div class="stop" v-for="[code, name] in secondRouteStops" @click="$emit('load-stop', String(code[1]))" :key="[code.id, name.id]">
                         <span class="stopName">
                             {{ name[1] }}
                         </span>
@@ -112,12 +112,11 @@ export default {
             // start rendering the data on the page
             let lineId = document.getElementById("linesSelect").value
             this.getLineFromApi(lineId).then(response => response.json()).then(data => {
-                // render first route
+                // use data here
                 this.firstRouteFirstTitle = data["routes"][0]["stops"][0]["name"]
                 this.firstRouteSecondTitle = data["routes"][0]["stops"][data["routes"][0]["stops"].length - 1]["name"]
                 for (let i = 0; i < data["routes"][0]["stops"].length; i++) {
                     let currStop = new Map()
-                    currStop.set("id", data["routes"][0]["stops"][i]["id"])
                     currStop.set("code", data["routes"][0]["stops"][i]["code"])
                     currStop.set("name", data["routes"][0]["stops"][i]["name"])
                     this.firstRouteStops[i] = currStop
@@ -129,7 +128,6 @@ export default {
                 this.secondRouteSecondTitle= data["routes"][1]["stops"][data["routes"][1]["stops"].length - 1]["name"]
                 for (let i = 0; i < data["routes"][1]["stops"].length; i++) {
                     let currStop = new Map()
-                    currStop.set("id", data["routes"][1]["stops"][i]["id"])
                     currStop.set("code", data["routes"][1]["stops"][i]["code"])
                     currStop.set("name", data["routes"][1]["stops"][i]["name"])
                     this.secondRouteStops[i] = currStop
@@ -138,7 +136,7 @@ export default {
             })
         },
         getLinesFromApi: function (typeId) {
-            const url = "http://localhost:8080/one/v3/lines/" + typeId;
+            const url = "http://localhost:8080/api/v3/lines/" + typeId;
             const headers = {
                 "x-api-key": "fudeqogehuxazisaqubojawerulaciquxofilibupetirimu",
                 "x-user-id": "0c8ceb98-aea8-4f47-8fb1-cc5c63abf379",
@@ -149,7 +147,7 @@ export default {
                 .then(data => data);
         },
         getLineFromApi: function (lineId) {
-            const url = "http://localhost:8080/one/v3/lines/" + this.currentTypeId + "/" + lineId;
+            const url = "http://localhost:8080/api/v3/lines/" + this.currentTypeId + "/" + lineId;
             const headers = {
                 "x-api-key": "fudeqogehuxazisaqubojawerulaciquxofilibupetirimu",
                 "x-user-id": "0c8ceb98-aea8-4f47-8fb1-cc5c63abf379",

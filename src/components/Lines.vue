@@ -112,7 +112,7 @@ export default {
             // start rendering the data on the page
             let lineId = document.getElementById("linesSelect").value
             this.getLineFromApi(lineId).then(response => response.json()).then(data => {
-                // use data here
+                // render first route
                 this.firstRouteFirstTitle = data["routes"][0]["stops"][0]["name"]
                 this.firstRouteSecondTitle = data["routes"][0]["stops"][data["routes"][0]["stops"].length - 1]["name"]
                 for (let i = 0; i < data["routes"][0]["stops"].length; i++) {

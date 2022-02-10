@@ -33,7 +33,6 @@ export default {
     methods: {
         renderStops: function () {
             this.getStopsFromDB().then(data => {
-                console.log("data", data)
                 this.stops = data
             })
         },
@@ -41,7 +40,6 @@ export default {
             return this.db.collection("FavouriteStops").get()
         },
         removeStop: function (stopCode) {
-            console.log(stopCode)
             this.db.collection("FavouriteStops").doc({code: stopCode}).delete().then(() => this.renderStops())
         }
     }
@@ -62,7 +60,6 @@ export default {
 
 .stopData {
     display: flex;
-    /*justify-content: space-between;*/
     align-items: center;
     height: 3rem;
     width: 97vw;

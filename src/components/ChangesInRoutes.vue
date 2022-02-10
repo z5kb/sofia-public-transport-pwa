@@ -73,6 +73,7 @@ export default {
                 }
             })
 
+            // return the scraped content
             return $.html()
         },
     }

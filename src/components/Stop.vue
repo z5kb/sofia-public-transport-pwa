@@ -48,7 +48,7 @@ export default {
     },
     methods: {
         renderData: function () {
-            this.getDataFromAPI(this.stopCode).then(response => response.json().then(data => {
+            this.getDataFromAPI(this.stopCode).then(response => response.json()).then(data => {
                 // clear any rendered lines
                 this.lines = []
 
@@ -82,10 +82,10 @@ export default {
                     // append current line to the "lines" array
                     this.lines[i] = [lineName, lineTimes]
                 }
-            }));
+            })
         },
         getDataFromAPI: function () {
-            const url = "http://localhost:8080/one/v3/stops/" + this.stopCode;
+            const url = "http://localhost:8080/api/v3/stops/" + this.stopCode;
             const headers = {
                 "x-api-key": "fudeqogehuxazisaqubojawerulaciquxofilibupetirimu",
                 "x-user-id": "0c8ceb98-aea8-4f47-8fb1-cc5c63abf379",
@@ -107,6 +107,8 @@ export default {
             }).delete().then(() => this.updateStopIsFav())
         },
         updateStopIsFav: function () {
+            // updates this.stopIsFav which shows if the currently loaded stop
+            // is a favourite one or not
             this.db.collection("FavouriteStops").get().then(data => {
                 for (let i = 0; i < data.length; i++) {
                     if (data[i]["code"] === String(this.stopCode)) {

@@ -1,15 +1,19 @@
 <template>
     <div id="stopArea">
-        <div id="searchArea">
-            <input v-model="stopId">
-            <button v-on:click="render_data(stopId)" type="button">Search</button>
+        <div id="search">
+            <input v-model="stopCode">
+            <button id="searchButton" @click="renderData" type="button">Search</button>
         </div>
-        <p id="stopName"></p>
-        <div id="linesArea">
-            <div id="lineArea" v-for="line in lines" :key="line.id">
+        <div id="stopHeader">
+            <a>{{ stopName }}</a>
+            <img alt="addStopToFavsIcon" v-if="!stopIsFav && stopIsFav !== null" @click="addStopToFavs()" class="icon" src="../assets/navigation-bar/favourite-heart@48x48.svg">
+            <img alt="removeStopFromFavsIcon" v-if="stopIsFav && stopIsFav !== null" @click="removeStopFromFavs()" class="icon" src="../assets/navigation-bar/alerts@48x48.svg">
+        </div>
+        <div id="stopMainContent">
+            <div id="line" v-for="line in lines" :key="line.id">
                 <p>{{ line[0] }}</p>
                 <div id="lineTimes">
-                    <div v-for="lineTime in line[1]">
+                    <div v-for="lineTime in line[1]" :key="lineTime.id">
                         {{ lineTime }}
                     </div>
                 </div>
@@ -19,44 +23,69 @@
 </template>
 
 <script>
+import Localbase from "localbase"
+
 export default {
     name: "Stop",
+    props: {
+        stopCodeFromAnotherComponent: String,
+    },
     data() {
         return {
-            stopId: null,
+            stopCode: this.stopCodeFromAnotherComponent,
+            stopName: null,
+            stopIsFav: null,
             lines: [],
+            db: new Localbase("db"),
+        }
+    },
+    mounted() {
+        // check if another component is trying to load a stop
+        if (this.stopCode !== null) {
+            this.updateStopIsFav()
+            document.getElementById("searchButton").click()
         }
     },
     methods: {
-        render_data: function (stopId) {
+        renderData: function () {
+            this.getDataFromAPI(this.stopCode).then(response => response.json()).then(data => {
+                // clear any rendered lines
+                this.lines = []
 
-            this.get_data_from_api(stopId)
-                .then(response => response.json().then(data => {
-                    // clear rendered components (if any)
-                    this.lines = []
+                // update header
+                this.stopName = data["name"]
+                this.updateStopIsFav()
 
-                    // change stop name
-                    document.getElementById("stopName").innerHTML = data["name"]
+                // iterate the data from the API and make a nested array with the names and the times of the lines
+                for (let i = 0; i < data["lines"].length; i++) {
+                    let lineName = data["lines"][i]["name"]
+                    let lineTimes = []
 
-                    // iterate the data from the API and make a nested array with the names and the times of the lines
-                    for (let i = 0; i < data["lines"].length; i++) {
-                        let lineName = data["lines"][i]["name"]
-                        let lineTimes = []
+                    // limit the lines' times to 5 (so they render properly on the screen)
+                    if (data["lines"][i]["times"].length > 5) {
+                        for (let j = 0; j < 5; j++) {
+                            lineTimes[j] = data["lines"][i]["times"][j]["time"]
+                        }
+                    } else {
                         for (let j = 0; j < data["lines"][i]["times"].length; j++) {
                             lineTimes[j] = data["lines"][i]["times"][j]["time"]
                         }
-
-                        if (lineName.length === 1) {
-                            lineName = "  " + lineName
-                        } else if (lineName.length === 2) {
-                            lineName = " " + lineName
-                        }
-                        this.lines[i] = [lineName, lineTimes]
                     }
-                }));
+
+                    // add spaces so the names are aligned properly on the html page
+                    if (lineName.length === 1) {
+                        lineName = "  " + lineName
+                    } else if (lineName.length === 2) {
+                        lineName = " " + lineName
+                    }
+
+                    // append current line to the "lines" array
+                    this.lines[i] = [lineName, lineTimes]
+                }
+            })
         },
-        get_data_from_api: function (stopId) {
-            const url = "http://localhost:8080/v3/stops/" + stopId;
+        getDataFromAPI: function () {
+            const url = "http://localhost:8080/api/v3/stops/" + this.stopCode;
             const headers = {
                 "x-api-key": "fudeqogehuxazisaqubojawerulaciquxofilibupetirimu",
                 "x-user-id": "0c8ceb98-aea8-4f47-8fb1-cc5c63abf379",
@@ -65,6 +94,30 @@ export default {
             return fetch(url, {headers})
                 .then(response => response)
                 .then(data => data);
+        },
+        addStopToFavs: function () {
+            this.db.collection("FavouriteStops").add({
+                code: String(this.stopCode),
+                name: this.stopName,
+            }).then(() => this.updateStopIsFav())
+        },
+        removeStopFromFavs: function () {
+            this.db.collection("FavouriteStops").doc({
+                code: String(this.stopCode)
+            }).delete().then(() => this.updateStopIsFav())
+        },
+        updateStopIsFav: function () {
+            // updates this.stopIsFav which shows if the currently loaded stop
+            // is a favourite one or not
+            this.db.collection("FavouriteStops").get().then(data => {
+                for (let i = 0; i < data.length; i++) {
+                    if (data[i]["code"] === String(this.stopCode)) {
+                        this.stopIsFav = true
+                        return
+                    }
+                }
+                this.stopIsFav = false
+            })
         },
     },
 }
@@ -77,31 +130,43 @@ export default {
     align-items: center;
 }
 
-#searchArea {
+#search {
     display: flex;
     align-items: center;
 }
 
-#searchArea button {
+#search button {
     width: 4rem;
     height: 1.3rem;
 }
 
-#linesArea {
+#stopHeader {
+    display: flex;
+    font-size: 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon {
+    width: 1rem;
+    height: 1rem;
+    padding: 1rem;
+}
+
+#stopMainContent {
     display: flex;
     flex-direction: column;
 }
 
-#lineArea {
+#line {
     display: flex;
     align-items: center;
     column-gap: 1rem;
-
     width: 97vw;
     background: grey
 }
 
-#lineArea p {
+#line p {
     font-size: 2rem;
     font-weight: bold;
     margin: 1rem 1rem 1rem 1rem

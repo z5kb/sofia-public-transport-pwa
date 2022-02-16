@@ -3,14 +3,14 @@
         <p id="noStopsPlaceholder" v-if="stops.length === 0">You don't have any favourite stops :(</p>
         <div class="stop" v-for="stop in stops" :key="stop.id">
             <div class="stopData" @click="$emit('load-stop', stop['code'])">
-                <span class="stopName">
-                    {{ stop["name"] }}
-                </span>
                 <span class="stopCode">
                      {{ stop["code"] }}
                 </span>
+                <span class="stopName">
+                    {{ stop["name"] }}
+                </span>
             </div>
-            <img alt="removeFromFavsIcon" @click="removeStop(stop['code'])" class="icon" src="../assets/navigation-bar/alerts@48x48.svg">
+            <img alt="removeFromFavsIcon" @click="removeStop(stop['code'])" class="icon" src="../assets/images/remove.svg">
         </div>
     </div>
 </template>
@@ -47,6 +47,8 @@ export default {
 </script>
 
 <style scoped>
+@import "../assets/colors.css";
+
 #mainContent {
     display: flex;
     flex-direction: column;
@@ -55,7 +57,9 @@ export default {
 .stop {
     display: flex;
     align-items: center;
-    background: lightgray;
+    max-width: 35rem;
+    margin: auto;
+    background: var(--color-neutral-200);
 }
 
 .stopData {
@@ -63,28 +67,27 @@ export default {
     align-items: center;
     height: 3rem;
     width: 97vw;
-    background: lightgray;
 }
 
 .stopName {
     font-size: 18px;
     text-align: center;
     margin: auto;
-    max-width: 16rem;
+    max-width: 14rem;
 }
 
 .stopCode {
     text-align: center;
     width: 3rem;
-    margin-right: 0.5rem;
+    margin: 0 0 0 0.5rem;
     color: #d2d2d2;
-    background: #414141;
+    background: var(--color-accent-600)
 }
 
 .icon {
-    width: 1rem;
-    height: 1rem;
-    padding: 1rem;
+    width: 1.6rem;
+    height: 1.6rem;
+    padding: 0 0.5rem 0 0.5rem;
 }
 
 #noStopsPlaceholder {

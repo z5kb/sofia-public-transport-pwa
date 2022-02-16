@@ -1,13 +1,13 @@
 <template>
-    <div id="stopArea">
+    <div id="mainContent">
         <div id="search">
-            <input v-model="stopCode">
-            <button id="searchButton" @click="renderData" type="button">Search</button>
+            <input id="searchInput" v-model="stopCode" placeholder="Enter a stop id...">
+            <button id="searchButton" @click="renderData" type="button"><img alt="search-icon" style="width: 1.6rem; height: 1.6rem" src="../assets/images/search.svg"></button>
         </div>
         <div id="stopHeader">
-            <a>{{ stopName }}</a>
-            <img alt="addStopToFavsIcon" v-if="!stopIsFav && stopIsFav !== null" @click="addStopToFavs()" class="icon" src="../assets/navigation-bar/favourite-heart@48x48.svg">
-            <img alt="removeStopFromFavsIcon" v-if="stopIsFav && stopIsFav !== null" @click="removeStopFromFavs()" class="icon" src="../assets/navigation-bar/alerts@48x48.svg">
+            <b id="stopName">{{ stopName }}</b>
+            <img alt="addStopToFavsIcon" v-if="!stopIsFav && stopIsFav !== null" @click="addStopToFavs()" class="icon" src="../assets/images/empty_heart.svg">
+            <img alt="removeStopFromFavsIcon" v-if="stopIsFav && stopIsFav !== null" @click="removeStopFromFavs()" class="icon" src="../assets/images/filled_heart.svg">
         </div>
         <div id="stopMainContent">
             <div id="line" v-for="line in lines" :key="line.id">
@@ -124,7 +124,9 @@ export default {
 </script>
 
 <style scoped>
-#stopArea {
+@import "../assets/colors.css";
+
+#mainContent {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -132,30 +134,63 @@ export default {
 
 #search {
     display: flex;
+    justify-content: center;
     align-items: center;
+    width: 20rem;
+    height: 3rem;
+    border-radius: 0.3rem;
+    /*background: #e8e8e8;*/
 }
 
 #search button {
-    width: 4rem;
-    height: 1.3rem;
+    height: 3rem;
+    width: 5rem;
+    padding: 0.5rem;
+    margin: 0;
+    border: 1px solid #d3d3d3;
+    border-radius: 25px;
+    background: var(--color-accent-800);
+}
+
+#search input {
+    height: 40px;
+    width: 12rem;
+    text-align: center;
+    font-size: 20px;
+    border: 0;
+    border-bottom: 2px solid black;
+    padding: 0;
+    margin: 0 1rem 0 0;
+}
+
+#search input:focus {
+    outline: none;
 }
 
 #stopHeader {
     display: flex;
-    font-size: 20px;
     align-items: center;
     justify-content: center;
+    column-gap: 1rem;
+    height: 3rem;
+    margin: 0.6rem 0 0.6rem 0;
+}
+
+#stopName {
+    font-size: 20px;
+    text-align: center;
 }
 
 .icon {
-    width: 1rem;
-    height: 1rem;
-    padding: 1rem;
+    width: 1.8rem;
+    height: 1.8rem;
+    padding-bottom: 0.3rem;
 }
 
 #stopMainContent {
     display: flex;
     flex-direction: column;
+    row-gap: 0.6rem;
 }
 
 #line {
@@ -163,7 +198,8 @@ export default {
     align-items: center;
     column-gap: 1rem;
     width: 97vw;
-    background: grey
+    max-width: 25rem;
+    background: var(--color-neutral-200);
 }
 
 #line p {
@@ -175,5 +211,6 @@ export default {
 #lineTimes {
     display: flex;
     column-gap: 1rem;
+    flex-wrap: wrap;
 }
 </style>

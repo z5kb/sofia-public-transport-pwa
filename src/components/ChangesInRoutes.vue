@@ -50,6 +50,7 @@ export default {
         scrapeContent: function (content) {
             // load the content in a Cheerio object in order to manipulate it with the library
             let $ = cheerio.load(content)
+            console.log($.html())
 
             // select all hrefs and iterate them
             let hrefs = $("a")
@@ -93,6 +94,7 @@ export default {
 
 .changeTitle {
     background: gray;
+    user-select: none;
 }
 
 .changeContent {

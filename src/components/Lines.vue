@@ -178,6 +178,7 @@ export default {
 #selectTypeDiv button {
     height: 2rem;
     width: 8rem;
+    user-select: none;
 }
 
 #typesList {
@@ -188,6 +189,7 @@ export default {
     background: lightgray;
     margin: 0;
     padding: 0;
+    user-select: none;
 }
 
 #typesList li {
@@ -197,6 +199,7 @@ export default {
 #linesSelect {
     height: 2rem;
     width: 8rem;
+    user-select: none;
 }
 
 .route {
@@ -213,6 +216,7 @@ export default {
     height: 5rem;
     width: 97vw;
     background: grey;
+    user-select: none;
 }
 
 .stop {
@@ -222,6 +226,7 @@ export default {
     height: 3rem;
     width: 97vw;
     background: lightgray;
+    user-select: none;
 }
 
 .stopName {

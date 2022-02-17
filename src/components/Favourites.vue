@@ -52,35 +52,41 @@ export default {
 #mainContent {
     display: flex;
     flex-direction: column;
+    row-gap: 0.5rem;
 }
 
 .stop {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    width: 100%;
     max-width: 35rem;
     margin: auto;
+    padding: 0.5rem;
     background: var(--color-neutral-200);
 }
 
 .stopData {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     height: 3rem;
-    width: 97vw;
+    width: 18rem;
+    flex-grow: 2;
 }
 
 .stopName {
     font-size: 18px;
     text-align: center;
-    margin: auto;
     max-width: 14rem;
+    margin: auto;
 }
 
 .stopCode {
     text-align: center;
     width: 3rem;
-    margin: 0 0 0 0.5rem;
-    color: #d2d2d2;
+    margin: 1rem;
+    color: var(--color-neutral-200);
     background: var(--color-accent-600)
 }
 
@@ -88,6 +94,7 @@ export default {
     width: 1.6rem;
     height: 1.6rem;
     padding: 0 0.5rem 0 0.5rem;
+    margin: 0.5rem;
 }
 
 #noStopsPlaceholder {

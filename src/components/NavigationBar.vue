@@ -1,17 +1,8 @@
 <template>
     <div id="navbar-component">
         <div id="sidebar" :style="'width: ' + sidebarWidth + ';'">
-            something
-            something
-            something
-            something
-            something
-            something
-            something
-            something
-            something
-            something
-            something
+            <span>Credits</span>
+            <a href="https://app.streamlinehq.com/icons/streamline-mini-line" target="_blank">Icons</a>
             <img @click="toggleSidebar()" src="../assets/images/remove.svg" style="width: 2rem; height: 2rem" alt="close-icon">
         </div>
 
@@ -72,6 +63,10 @@ export default {
         }
     },
     mounted() {
+        // set page background
+        document.body.style.backgroundColor = "#F9F8FF"
+
+        // render the default component
         this.renderStopComponent()
     },
     methods: {

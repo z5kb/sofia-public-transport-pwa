@@ -1,7 +1,7 @@
 <template>
     <div id="mainContent">
         <div id="search">
-            <input id="searchInput" v-model="stopCode" placeholder="Enter a stop id...">
+            <input id="searchInput" v-model="stopCode" placeholder="Enter a stop id..." autocomplete="off">
             <button id="searchButton" @click="renderData" type="button"><img alt="search-icon" style="width: 1.6rem; height: 1.6rem" src="../assets/images/search.svg"></button>
         </div>
         <div id="stopHeader">
@@ -11,11 +11,20 @@
         </div>
         <div id="stopMainContent">
             <div id="line" v-for="line in lines" :key="line.id">
-                <p>{{ line[0] }}</p>
+                <span class="lineName">{{ line['lineName'] }}</span>
                 <div id="lineTimes">
-                    <div v-for="lineTime in line[1]" :key="lineTime.id">
+                    <div id="firstLineTime" >
+                        {{ line['firstLineTime'] }}
+                    </div>
+                    <div v-for="lineTime in line['lineTimes']" :key="lineTime.id">
                         {{ lineTime }}
                     </div>
+                </div>
+                <div id="busProperties">
+                    <img v-if="line['hasAc'] === true" class="icon" src="../assets/images/air_conditioner.svg" alt="air-conditioner">
+                    <div v-else class="icon"></div>
+                    <img v-if="line['hasPlatform'] === true" class="icon" src="../assets/images/platform.svg" alt="platform">
+                    <div v-else class="icon"></div>
                 </div>
             </div>
         </div>
@@ -48,7 +57,7 @@ export default {
     },
     methods: {
         renderData: function () {
-            this.getDataFromAPI(this.stopCode).then(response => response.json()).then(data => {
+            this.getDataFromAPI().then(data => {
                 // clear any rendered lines
                 this.lines = []
 
@@ -59,6 +68,8 @@ export default {
                 // iterate the data from the API and make a nested array with the names and the times of the lines
                 for (let i = 0; i < data["lines"].length; i++) {
                     let lineName = data["lines"][i]["name"]
+                    let hasAc = data["lines"][i]["times"][0]["hasAc"]
+                    let hasPlatform = data["lines"][i]["times"][0]["hasPlatform"]
                     let lineTimes = []
 
                     // limit the lines' times to 5 (so they render properly on the screen)
@@ -72,15 +83,17 @@ export default {
                         }
                     }
 
-                    // add spaces so the names are aligned properly on the html page
-                    if (lineName.length === 1) {
-                        lineName = "  " + lineName
-                    } else if (lineName.length === 2) {
-                        lineName = " " + lineName
-                    }
+                    // get the first line time
+                    let firstLineTime = lineTimes.shift()
 
                     // append current line to the "lines" array
-                    this.lines[i] = [lineName, lineTimes]
+                    this.lines[i] = {
+                        "lineName": lineName,
+                        "firstLineTime": firstLineTime,
+                        "lineTimes": lineTimes,
+                        "hasAc": hasAc,
+                        "hasPlatform": hasPlatform,
+                    }
                 }
             })
         },
@@ -90,10 +103,7 @@ export default {
                 "x-api-key": "fudeqogehuxazisaqubojawerulaciquxofilibupetirimu",
                 "x-user-id": "0c8ceb98-aea8-4f47-8fb1-cc5c63abf379",
             }
-
-            return fetch(url, {headers})
-                .then(response => response)
-                .then(data => data);
+            return fetch(url, {headers}).then(response => response.json())
         },
         addStopToFavs: function () {
             this.db.collection("FavouriteStops").add({
@@ -139,7 +149,6 @@ export default {
     width: 20rem;
     height: 3rem;
     border-radius: 0.3rem;
-    /*background: #e8e8e8;*/
 }
 
 #search button {
@@ -161,6 +170,7 @@ export default {
     border-bottom: 2px solid black;
     padding: 0;
     margin: 0 1rem 0 0;
+    background: 0;
 }
 
 #search input:focus {
@@ -196,21 +206,39 @@ export default {
 #line {
     display: flex;
     align-items: center;
-    column-gap: 1rem;
+    justify-content: space-between;
     width: 97vw;
     max-width: 25rem;
+    height: 5rem;
     background: var(--color-neutral-200);
 }
 
-#line p {
+.lineName {
+    width: 9rem;
     font-size: 2rem;
     font-weight: bold;
-    margin: 1rem 1rem 1rem 1rem
+    margin: 1rem;
+}
+
+#firstLineTime {
+    width: 100%;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
 }
 
 #lineTimes {
     display: flex;
     column-gap: 1rem;
     flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+#busProperties {
+    display: flex;
+    align-items: center;
+    column-gap: 0.4rem;
+    margin: 1rem;
 }
 </style>

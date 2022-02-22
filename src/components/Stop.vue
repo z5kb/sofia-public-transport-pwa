@@ -1,5 +1,5 @@
 <template>
-    <div id="mainContent">
+    <div id="content">
         <div id="search">
             <input id="searchInput" v-model="stopCode" placeholder="Enter a stop id..." autocomplete="off">
             <button id="searchButton" @click="renderData" type="button"><img alt="search-icon" style="width: 1.6rem; height: 1.6rem" src="../assets/images/search.svg"></button>
@@ -9,7 +9,7 @@
             <img alt="addStopToFavsIcon" v-if="!stopIsFav && stopIsFav !== null" @click="addStopToFavs()" class="icon" src="../assets/images/empty_heart.svg">
             <img alt="removeStopFromFavsIcon" v-if="stopIsFav && stopIsFav !== null" @click="removeStopFromFavs()" class="icon" src="../assets/images/filled_heart.svg">
         </div>
-        <div id="stopMainContent">
+        <div id="mainContent">
             <div id="line" v-for="line in lines" :key="line.id">
                 <span class="lineName">{{ line['lineName'] }}</span>
                 <div id="lineTimes">
@@ -136,7 +136,7 @@ export default {
 <style scoped>
 @import "../assets/colors.css";
 
-#mainContent {
+#content {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -158,7 +158,7 @@ export default {
     margin: 0;
     border: 1px solid #d3d3d3;
     border-radius: 25px;
-    background: var(--color-accent-800);
+    background: var(--color-accent-900);
 }
 
 #search input {
@@ -197,7 +197,7 @@ export default {
     padding-bottom: 0.3rem;
 }
 
-#stopMainContent {
+#mainContent {
     display: flex;
     flex-direction: column;
     row-gap: 0.6rem;
@@ -214,10 +214,10 @@ export default {
 }
 
 .lineName {
+    text-align: center;
     width: 9rem;
-    font-size: 2rem;
+    font-size: 30px;
     font-weight: bold;
-    margin: 1rem;
 }
 
 #firstLineTime {

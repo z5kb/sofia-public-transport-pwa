@@ -1,6 +1,11 @@
 :root {
-    --color-accent-800: #005CE7;
-    --color-accent-600: #414141;
-    --color-neutral-100: #F9F8FF;
+    font-family: "Roboto", sans;
+    font-size: 14px;
+    /*--color-accent-900: #005CE7;*/
+    --color-accent-900: #2E5DA4;
+    --color-neutral-500: #414141;
+    --color-accent-300: #96a4d2;
     --color-neutral-200: #EFEDFF;
+    --color-neutral-100: #F9F8FF;
+    --color-rgb-black: rgb(65, 65, 65, 20%)
 }

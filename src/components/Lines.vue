@@ -1,24 +1,26 @@
 <template>
-    <div id="stopMainContent">
-        <div id="selectTypeDiv">
-            <button id="typesButton" @click="toggleSelectionDropdown('typesList')">Select a type</button>
-            <ul id="typesList" style="display: none">
-                <li @click="loadType(1, 'Buses')">Buses</li>
-                <li @click="loadType(2, 'Trolleys')">Trolleys</li>
-                <li @click="loadType(0, 'Trams')">Trams</li>
-            </ul>
+    <div id="mainContent">
+        <div id="header">
+            <select class="select" @change="loadType($event)">
+                <option selected disabled hidden value="">Изберете тип</option>
+                <option value="1">Автобуси</option>
+                <option value="2">Тролеи</option>
+                <option value="0">Трамваи</option>
+            </select>
+            <span class="disabledSelectParent">
+                <select id="linesSelect" class="select disabledSelect" @change="loadLine()">
+                    <option selected disabled hidden>--------------</option>
+                    <option v-for="line in lines" :key="line.id" value="placeholder">{{ line[0] }}</option>
+                </select>
+            </span>
         </div>
-        <select id="linesSelect" @change="loadLine()">
-            <option selected disabled hidden>Select a line</option>
-            <option v-for="line in lines" :key="line.id" value="placeholder">{{ line[0] }}</option>
-        </select>
         <div id="line">
             <div class="route" v-if="firstRouteIsActive">
-                <div class="routeTitles">
-                    <span>{{ firstRouteFirstTitle }}</span>
-                    <span>{{ firstRouteSecondTitle }}</span>
+                <div class="routeTitlesDiv" @click="toggleStopsVisibility('firstRouteStops')" v-bind:style="firstRouteTitleStyle">
+                    <span class="routeTitle">ОТ {{ firstRouteFirstTitle }}</span>
+                    <span class="routeTitle">ДО {{ firstRouteSecondTitle }}</span>
                 </div>
-                <div>
+                <div id="firstRouteStops">
                     <div class="stop" v-for="[code, name] in firstRouteStops" :key="[code.id, name.id]" @click="$emit('load-stop', String(code[1]))">
                         <span class="stopName">
                             {{ name[1] }}
@@ -30,11 +32,11 @@
                 </div>
             </div>
             <div class="route" v-if="secondRouteIsActive">
-                <div class="routeTitles">
-                    <span>{{ secondRouteFirstTitle }}</span>
-                    <span>{{ secondRouteSecondTitle }}</span>
+                <div class="routeTitlesDiv" @click="toggleStopsVisibility('secondRouteStops')" v-bind:style="secondRouteTitleStyle">
+                    <span class="routeTitle">ОТ {{ secondRouteFirstTitle }}</span>
+                    <span class="routeTitle">ДО {{ secondRouteSecondTitle }}</span>
                 </div>
-                <div>
+                <div id="secondRouteStops">
                     <div class="stop" v-for="[code, name] in secondRouteStops" @click="$emit('load-stop', String(code[1]))" :key="[code.id, name.id]">
                         <span class="stopName">
                             {{ name[1] }}
@@ -56,6 +58,8 @@ export default {
         return {
             currentTypeId: null,
             lines: [],
+            firstRouteTitleStyle: "border-radius: 0.5rem 0.5rem 0.5rem 0.5rem;",
+            secondRouteTitleStyle: "border-radius: 0.5rem 0.5rem 0.5rem 0.5rem;",
             firstRouteIsActive: false,
             firstRouteFirstTitle: null,
             firstRouteSecondTitle: null,
@@ -67,26 +71,12 @@ export default {
         }
     },
     methods: {
-        toggleSelectionDropdown: function (dropdownId) {
-            let el = document.getElementById(dropdownId)
-            if (el.style.display === "none") {
-                el.style.display = "block"
-            } else {
-                el.style.display = "none"
-            }
-        },
-        loadType: function (typeId, typeName) {
-            // save the chosen type
-            this.currentTypeId = typeId
-
-            // update the text of the button
-            document.getElementById("typesButton").innerText = typeName
-
-            // close dropdown
-            this.toggleSelectionDropdown("typesList")
+        loadType: function (event) {
+            // set the current lines' type
+            this.currentTypeId = event.target.value
 
             // start rendering the data on the page
-            this.getLinesFromApi(typeId).then(response => response.json()).then(data => {
+            this.getLinesFromApi().then(response => response.json()).then(data => {
                 // clear rendered lines (if any)
                 this.lines = []
 
@@ -94,7 +84,6 @@ export default {
                 for (let i = 0; i < data.length; i++) {
                     this.lines[i] = [data[i]["name"], data[i]["id"]]
                 }
-
                 return this.lines
             }).then(lines => {
                 // set each lineId as the value of each <option>
@@ -102,6 +91,11 @@ export default {
                 for (let i = 0; i < renderedLines.length - 1; i++) {
                     renderedLines[i + 1].setAttribute("value", lines[i][1])
                 }
+
+                // change CSS so the "Select a line" <select> appears enabled
+                document.getElementById("linesSelect").classList.remove("disabledSelect")
+                document.getElementById("linesSelect").parentElement.classList.remove("disabledSelectParent")
+                document.getElementById("linesSelect").children[0].innerHTML = "Изберете линия"
             })
         },
         loadLine: function () {
@@ -135,13 +129,12 @@ export default {
                 this.secondRouteIsActive= true
             })
         },
-        getLinesFromApi: function (typeId) {
-            const url = "http://localhost:8080/api/v3/lines/" + typeId;
+        getLinesFromApi: function () {
+            const url = "http://localhost:8080/api/v3/lines/" + this.currentTypeId;
             const headers = {
                 "x-api-key": "fudeqogehuxazisaqubojawerulaciquxofilibupetirimu",
                 "x-user-id": "0c8ceb98-aea8-4f47-8fb1-cc5c63abf379",
             }
-
             return fetch(url, {headers})
                 .then(response => response)
                 .then(data => data);
@@ -152,71 +145,106 @@ export default {
                 "x-api-key": "fudeqogehuxazisaqubojawerulaciquxofilibupetirimu",
                 "x-user-id": "0c8ceb98-aea8-4f47-8fb1-cc5c63abf379",
             }
-
             return fetch(url, {headers})
                 .then(response => response)
                 .then(data => data);
         },
+        toggleStopsVisibility: function (stopsDivId) {
+            let el = document.getElementById(stopsDivId)
+            if (el.style.display === "flex") {
+                if (stopsDivId === "firstRouteStops") {
+                    this.firstRouteTitleStyle = "border-radius: 0.5rem 0.5rem 0.5rem 0.5rem;"
+                    el.style.display = "none"
+                } else if (stopsDivId === "secondRouteStops") {
+                    this.secondRouteTitleStyle = "border-radius: 0.5rem 0.5rem 0.5rem 0.5rem;"
+                    el.style.display = "none"
+                }
+            } else {
+                if (stopsDivId === "firstRouteStops") {
+                    this.firstRouteTitleStyle = "border-radius: 0.5rem 0.5rem 0 0;"
+                    el.style.display = "flex"
+                } else if (stopsDivId === "secondRouteStops") {
+                    this.secondRouteTitleStyle = "border-radius: 0.5rem 0.5rem 0 0;"
+                    el.style.display = "flex"
+                }
+            }
+        }
     }
 }
 </script>
 
 <style scoped>
-#stopMainContent {
+#mainContent {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     justify-content: center;
-    width: 80%;
+    row-gap: 2rem;
+    max-width: 35rem;
     margin: auto;
 }
 
-#selectTypeDiv {
-    width: 8rem;
-    max-width: 8rem;
+#header {
+    display: flex;
+    justify-content: center;
 }
 
-#selectTypeDiv button {
-    height: 2rem;
-    width: 8rem;
+.select {
+    text-align: center;
+    height: 3rem;
+    width: 10rem;
     user-select: none;
+    border: none;
+    background: var(--color-neutral-200);
 }
 
-#typesList {
-    display: none;
-    position: absolute;
-    list-style: none;
-    text-align: left;
-    background: lightgray;
-    margin: 0;
-    padding: 0;
-    user-select: none;
+.select:after {
+    content: "hi";
 }
 
-#typesList li {
-    width: 8rem;
+.select:focus {
+    outline: none;
 }
 
-#linesSelect {
-    height: 2rem;
-    width: 8rem;
-    user-select: none;
+.disabledSelectParent {
+    cursor: not-allowed;
+}
+
+.disabledSelect {
+    pointer-events: none;
 }
 
 .route {
     display: flex;
     flex-direction: column;
-    padding-top: 1rem;
+    align-items: center;
+    max-width: 35rem;
 }
 
-.routeTitles {
+.routeTitlesDiv {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 5rem;
-    width: 97vw;
-    background: grey;
+    width: 100%;
+    background: var(--color-accent-300);
     user-select: none;
+}
+
+.routeTitle {
+    font-size: 18px;
+}
+
+#line {
+    display: flex;
+    flex-direction: column;
+    row-gap: 2rem;
+}
+
+#firstRouteStops, #secondRouteStops {
+    display: none;
+    flex-direction: column;
+    width: 100%;
 }
 
 .stop {
@@ -224,13 +252,12 @@ export default {
     justify-content: space-between;
     align-items: center;
     height: 3rem;
-    width: 97vw;
-    background: lightgray;
+    background: var(--color-neutral-200);
     user-select: none;
 }
 
 .stopName {
-    font-size: 18px;
+    font-size: 16px;
     text-align: center;
     margin: auto;
     max-width: 16rem;

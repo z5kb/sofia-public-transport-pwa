@@ -52,17 +52,17 @@ export default {
 #mainContent {
     display: flex;
     flex-direction: column;
-    row-gap: 0.5rem;
 }
 
 .stop {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    height: 3.5rem;
     width: 100%;
     max-width: 35rem;
     margin: auto;
-    padding: 0.5rem;
+    padding: 0.3rem 0 0.3rem 0;
     background: var(--color-neutral-200);
 }
 
@@ -85,9 +85,11 @@ export default {
 .stopCode {
     text-align: center;
     width: 3rem;
-    margin: 1rem;
+    margin: 0.5rem;
+    padding: 0.15rem;
+    border-radius: 0.2rem;
     color: var(--color-neutral-200);
-    background: var(--color-accent-600)
+    background: var(--color-neutral-500)
 }
 
 .icon {

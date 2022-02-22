@@ -1,11 +1,13 @@
 <template>
     <div id="mainContent">
         <div id="test"></div>
-        <div class="change" v-for="[changeId, changeTitle] in titles" :key="[changeId.id, changeTitle.id]">
-            <div class="changeTitle" @click="renderContent(changeId)">
-                {{ changeTitle}}
+        <div class="change" v-for="change in changes" :key="change.id">
+            <div class="changeTitle" @click="renderContent(change.id)">
+                <span>
+                {{ change.title }}
+                </span>
             </div>
-            <div class="changeContent" v-bind:id="changeId">
+            <div class="changeContent" v-bind:id="change.id">
             </div>
         </div>
     </div>
@@ -18,7 +20,7 @@ export default {
     name: "ChangesInRoutes",
     data() {
         return {
-            titles: [],
+            changes: [],
             content: null,
         }
     },
@@ -28,11 +30,14 @@ export default {
     methods: {
         renderTitles: function () {
             this.fetchTitles().then(response => response.json()).then(data => {
+                // clear previous changes
+                this.changes = {}
+
                 // extract the needed data from the data the API returned
                 for (let i = 0; i < data["results"].length; i++) {
-                    let changeId = data["results"][i]["id"]
-                    let changeTitle = data["results"][i]["title"]
-                    this.titles[i] = [changeId, changeTitle]
+                    let id = data["results"][i]["id"]
+                    let title = data["results"][i]["title"]
+                    this.changes[i] = {"id": id, "title": title}
                 }
             })
         },
@@ -40,9 +45,16 @@ export default {
             return fetch("http://localhost:8080/changes-in-routes-api/")
         },
         renderContent: function (changeId) {
-            this.fetchContent(changeId).then(response => response.json()).then(data => {
-                document.getElementById(changeId).innerHTML = this.scrapeContent(data["content"])
-            })
+            if (document.getElementById(changeId).innerHTML === "") {
+                // data has not been fetched yet
+                this.fetchContent(changeId).then(response => response.json()).then(data => {
+                    document.getElementById(changeId).innerHTML = "<span>" + this.scrapeContent(data["content"]) + "</span>"
+                    this.toggleContentVisibility(changeId)
+                })
+            } else {
+                // data has already been fetched
+                this.toggleContentVisibility(changeId)
+            }
         },
         fetchContent: function (changeId) {
             return fetch("http://localhost:8080/changes-in-routes-api/" + changeId + "/")
@@ -50,7 +62,6 @@ export default {
         scrapeContent: function (content) {
             // load the content in a Cheerio object in order to manipulate it with the library
             let $ = cheerio.load(content)
-            console.log($.html())
 
             // select all hrefs and iterate them
             let hrefs = $("a")
@@ -60,9 +71,15 @@ export default {
 
                 // check if the element inside the href is data we need or <img>
                 if (href[0].children[0].name === "strong") {
-                    let data = href[0].children[0].children[0].data
-                    href.parent().prepend("<strong>" + data + "</strong>")
-                    href.remove()
+                    // check if there is an image in the <strong> tag
+                    if(href[0].children[0].children[0].name === "img") {
+                        href.remove()
+                    } else {
+                        // regular scenario
+                        let data = href[0].children[0].children[0].data
+                        href.parent().prepend("<strong>" + data + "</strong>")
+                        href.remove()
+                    }
                 } else if (href[0].children[0].name === "img") {
                     // delete the parent of the <img> and everything inside it
                     href.parent().remove()
@@ -77,14 +94,26 @@ export default {
             // return the scraped content
             return $.html()
         },
+        toggleContentVisibility: function (id) {
+            let el = document.getElementById(String(id))
+            if (el.style.display === "block") {
+                el.style.display = "none"
+            } else {
+                el.style.display = "block"
+            }
+        },
     }
 }
 </script>
 
 <style scoped>
+@import "../assets/colors.css";
+
 #mainContent {
     display: flex;
     flex-direction: column;
+    max-width: 50rem;
+    margin: auto;
 }
 
 .change {
@@ -93,11 +122,21 @@ export default {
 }
 
 .changeTitle {
-    background: gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 4rem;
+    background: var(--color-neutral-200);
     user-select: none;
 }
 
+.changeTitle span {
+    text-align: center;
+}
+
 .changeContent {
-    background: lightgray;
+    padding: 0 1rem 0 1rem;
+    line-height: 1.5;
+    background: var(--color-neutral-100);
 }
 </style>

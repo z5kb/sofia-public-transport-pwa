@@ -15,16 +15,16 @@
         </div>
         <div id="navbar">
             <div @click="renderStopComponent()" :class="renderStopComponentStyle" class="navbarTab">
-                Search
+                Търсене
             </div>
             <div @click="renderFavouritesComponent()" :class="renderFavouritesComponentStyle" class="navbarTab">
-                Favourites
+                Любими
             </div>
             <div @click="renderLinesComponent()" :class="renderLinesComponentStyle" class="navbarTab">
-                Lines
+                Линии
             </div>
             <div @click="renderChangesComponent()" :class="renderChangesComponentStyle" class="navbarTab">
-                Changes
+                Промени
             </div>
         </div>
         <Stop v-if="stopIsActive" v-bind:stopCodeFromAnotherComponent="stopId"></Stop>
@@ -130,7 +130,7 @@ export default {
     left: 0;
     background: lightblue;
     overflow-x: hidden;
-    transition: 0.5s;
+    transition: 0.3s;
 }
 
 #navbar {
@@ -147,7 +147,7 @@ export default {
 }
 
 .currNavbarTab {
-    border-bottom: 5px solid var(--color-accent-800);
+    border-bottom: 5px solid var(--color-accent-900);
     border-radius: 4px;
 }
 </style>

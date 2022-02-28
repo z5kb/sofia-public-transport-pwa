@@ -3,14 +3,14 @@
         <p id="noStopsPlaceholder" v-if="stops.length === 0">You don't have any favourite stops :(</p>
         <div class="stop" v-for="stop in stops" :key="stop.id">
             <div class="stopData" @click="$emit('load-stop', stop['code'])">
-                <span class="stopName">
-                    {{ stop["name"] }}
-                </span>
                 <span class="stopCode">
                      {{ stop["code"] }}
                 </span>
+                <span class="stopName">
+                    {{ stop["name"] }}
+                </span>
             </div>
-            <img alt="removeFromFavsIcon" @click="removeStop(stop['code'])" class="icon" src="../assets/navigation-bar/alerts@48x48.svg">
+            <span class="removeIcon" @click="removeStop(stop['code'])"></span>
         </div>
     </div>
 </template>
@@ -47,44 +47,63 @@ export default {
 </script>
 
 <style scoped>
+@import "../assets/colors.css";
+
 #mainContent {
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
 .stop {
     display: flex;
     align-items: center;
-    background: lightgray;
+    justify-content: space-between;
+    height: 3.5rem;
+    width: 100%;
+    max-width: 35rem;
+    padding: 0.3rem 0 0.3rem 0;
+    background: var(--color-neutral-200);
+
+    /* set borders & overlap them */
+    border: 1px solid var(--color-borders);
+    margin-top: -1px;
 }
 
 .stopData {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     height: 3rem;
-    width: 97vw;
-    background: lightgray;
+    width: 18rem;
+    flex-grow: 2;
 }
 
 .stopName {
     font-size: 18px;
     text-align: center;
+    max-width: 14rem;
     margin: auto;
-    max-width: 16rem;
 }
 
 .stopCode {
     text-align: center;
     width: 3rem;
-    margin-right: 0.5rem;
-    color: #d2d2d2;
-    background: #414141;
+    margin: 1rem;
+    padding: 0.15rem;
+    border-radius: 3px;
+    color: var(--color-neutral-200);
+    background: var(--color-neutral-500);
+    transition: 0.5s;
 }
 
-.icon {
-    width: 1rem;
-    height: 1rem;
-    padding: 1rem;
+.removeIcon {
+    mask: url("../assets/images/remove_circle_outline_black_18px.svg");
+    background: var(--color-main-text);
+    width: 32px;
+    height: 32px;
+    margin: 1rem;
+    transition: 0.5s;
 }
 
 #noStopsPlaceholder {

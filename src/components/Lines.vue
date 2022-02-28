@@ -7,7 +7,7 @@
                 <option value="2">Тролеи</option>
                 <option value="0">Трамваи</option>
             </select>
-            <span class="disabledSelectParent">
+            <span class="disabledSelectParent" style="margin-left: -1px">
                 <select id="linesSelect" class="select disabledSelect" @change="loadLine()">
                     <option selected disabled hidden>--------------</option>
                     <option v-for="line in lines" :key="line.id" value="placeholder">{{ line[0] }}</option>
@@ -22,12 +22,12 @@
                 </div>
                 <div id="firstRouteStops">
                     <div class="stop" v-for="[code, name] in firstRouteStops" :key="[code.id, name.id]" @click="$emit('load-stop', String(code[1]))">
-                        <span class="stopName">
-                            {{ name[1] }}
-                        </span>
                         <span class="stopCode">
                              {{ code[1] }}
                          </span>
+                        <span class="stopName">
+                            {{ name[1] }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -38,12 +38,12 @@
                 </div>
                 <div id="secondRouteStops">
                     <div class="stop" v-for="[code, name] in secondRouteStops" @click="$emit('load-stop', String(code[1]))" :key="[code.id, name.id]">
-                        <span class="stopName">
-                            {{ name[1] }}
-                        </span>
                         <span class="stopCode">
                              {{ code[1] }}
                          </span>
+                        <span class="stopName">
+                            {{ name[1] }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -190,10 +190,11 @@ export default {
 
 .select {
     text-align: center;
+    color: var(--color-main-text);
     height: 3rem;
     width: 10rem;
     user-select: none;
-    border: none;
+    border: 1px solid var(--color-borders);
     background: var(--color-neutral-200);
 }
 
@@ -216,7 +217,6 @@ export default {
 .route {
     display: flex;
     flex-direction: column;
-    align-items: center;
     max-width: 35rem;
 }
 
@@ -227,8 +227,9 @@ export default {
     align-items: center;
     height: 5rem;
     width: 100%;
-    background: var(--color-accent-300);
     user-select: none;
+    background: var(--color-neutral-200);
+    border: 1px solid var(--color-borders);
 }
 
 .routeTitle {
@@ -251,13 +252,17 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 3rem;
-    background: var(--color-neutral-200);
+    height: 3.5rem;
+    width: 100%;
     user-select: none;
+
+    /* set borders & overlap them */
+    border: 1px solid var(--color-borders);
+    margin-top: -1px;
 }
 
 .stopName {
-    font-size: 16px;
+    font-size: 18px;
     text-align: center;
     margin: auto;
     max-width: 16rem;
@@ -266,8 +271,9 @@ export default {
 .stopCode {
     text-align: center;
     width: 3rem;
-    margin-right: 0.5rem;
-    color: #d2d2d2;
-    background: #414141;
+    margin: 1rem;
+    border-radius: 3px;
+    color: var(--color-neutral-200);
+    background: var(--color-neutral-500);
 }
 </style>

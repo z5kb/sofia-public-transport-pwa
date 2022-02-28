@@ -10,7 +10,7 @@
                     {{ stop["name"] }}
                 </span>
             </div>
-            <img alt="removeFromFavsIcon" @click="removeStop(stop['code'])" class="icon" src="../assets/images/remove.svg">
+            <span class="removeIcon" @click="removeStop(stop['code'])"></span>
         </div>
     </div>
 </template>
@@ -52,6 +52,7 @@ export default {
 #mainContent {
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
 .stop {
@@ -61,9 +62,12 @@ export default {
     height: 3.5rem;
     width: 100%;
     max-width: 35rem;
-    margin: auto;
     padding: 0.3rem 0 0.3rem 0;
     background: var(--color-neutral-200);
+
+    /* set borders & overlap them */
+    border: 1px solid var(--color-borders);
+    margin-top: -1px;
 }
 
 .stopData {
@@ -85,18 +89,21 @@ export default {
 .stopCode {
     text-align: center;
     width: 3rem;
-    margin: 0.5rem;
+    margin: 1rem;
     padding: 0.15rem;
-    border-radius: 0.2rem;
+    border-radius: 3px;
     color: var(--color-neutral-200);
-    background: var(--color-neutral-500)
+    background: var(--color-neutral-500);
+    transition: 0.5s;
 }
 
-.icon {
-    width: 1.6rem;
-    height: 1.6rem;
-    padding: 0 0.5rem 0 0.5rem;
-    margin: 0.5rem;
+.removeIcon {
+    mask: url("../assets/images/remove_circle_outline_black_18px.svg");
+    background: var(--color-main-text);
+    width: 32px;
+    height: 32px;
+    margin: 1rem;
+    transition: 0.5s;
 }
 
 #noStopsPlaceholder {

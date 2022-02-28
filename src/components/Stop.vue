@@ -1,13 +1,18 @@
 <template>
     <div id="content">
         <div id="search">
-            <input id="searchInput" v-model="stopCode" placeholder="Enter a stop id..." autocomplete="off">
-            <button id="searchButton" @click="renderData" type="button"><img alt="search-icon" style="width: 1.6rem; height: 1.6rem" src="../assets/images/search.svg"></button>
+            <input v-model="stopCode" placeholder="Въведете номер на спирка..." autocomplete="off">
+            <button id="searchButton" @click="renderData()" type="button">
+                <div>
+                    <span id="searchIcon"></span>
+                    <a>ТЪРСЕНЕ</a>
+                </div>
+            </button>
         </div>
         <div id="stopHeader">
             <b id="stopName">{{ stopName }}</b>
-            <img alt="addStopToFavsIcon" v-if="!stopIsFav && stopIsFav !== null" @click="addStopToFavs()" class="icon" src="../assets/images/empty_heart.svg">
-            <img alt="removeStopFromFavsIcon" v-if="stopIsFav && stopIsFav !== null" @click="removeStopFromFavs()" class="icon" src="../assets/images/filled_heart.svg">
+            <span id="favouriteUnfilledIcon" v-if="!stopIsFav && stopIsFav !== null" @click="addStopToFavs()"></span>
+            <span id="favouriteFilledIcon" v-if="stopIsFav && stopIsFav !== null" @click="removeStopFromFavs()"></span>
         </div>
         <div id="mainContent">
             <div id="line" v-for="line in lines" :key="line.id">
@@ -21,9 +26,9 @@
                     </div>
                 </div>
                 <div id="busProperties">
-                    <img v-if="line['hasAc'] === true" class="icon" src="../assets/images/air_conditioner.svg" alt="air-conditioner">
+                    <span id="airConditionerIcon" v-if="line['hasAc'] === true"></span>
                     <div v-else class="icon"></div>
-                    <img v-if="line['hasPlatform'] === true" class="icon" src="../assets/images/platform.svg" alt="platform">
+                    <span id="accessibleIcon" v-if="line['hasPlatform'] === true"></span>
                     <div v-else class="icon"></div>
                 </div>
             </div>
@@ -32,6 +37,7 @@
 </template>
 
 <script>
+// an IndexedDB library
 import Localbase from "localbase"
 
 export default {
@@ -126,6 +132,9 @@ export default {
                         return
                     }
                 }
+                if (this.stopIsFav === null && this.stopCode === null) {
+                    return
+                }
                 this.stopIsFav = false
             })
         },
@@ -144,36 +153,71 @@ export default {
 
 #search {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 20rem;
-    height: 3rem;
+    row-gap: 0.8rem;
+    width: 80%;
+    max-width: 25rem;
     border-radius: 0.3rem;
 }
 
-#search button {
-    height: 3rem;
-    width: 5rem;
-    padding: 0.5rem;
+#searchButton {
+    height: 36px;
+    width: 100%;
+    max-width: 30rem;
+    padding: 0 16px 0 12px;
     margin: 0;
-    border: 1px solid #d3d3d3;
-    border-radius: 25px;
+    border: 0;
+    border-radius: 5px;
     background: var(--color-accent-900);
+
+    box-shadow: 0 3px 5px rgb(11, 25, 47, 0.2);
 }
 
-#search input {
+#searchButton > div {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    column-gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+#searchButton > div > a {
+    color: var(--color-search-button);
+    font-size: 15px;
+    letter-spacing: 1px;
+    transition: 0.5s;
+}
+
+#searchIcon {
+    mask: url("../assets/images/search_black_18px.svg");
+    background: var(--color-search-button);
+    width: 18px;
+    height: 18px;
+    transition: 0.5s;
+}
+
+#search > input {
+    color: var(--color-main-text);
     height: 40px;
-    width: 12rem;
+    width: 100%;
     text-align: center;
     font-size: 20px;
     border: 0;
-    border-bottom: 2px solid black;
+    border-bottom: 2px solid var(--color-main-text);
     padding: 0;
-    margin: 0 1rem 0 0;
+    margin: 0;
     background: 0;
+    transition: 0.5s;
 }
 
-#search input:focus {
+::placeholder {
+    color: var(--color-placeholder);
+}
+
+#search > input:focus {
     outline: none;
 }
 
@@ -194,7 +238,22 @@ export default {
 .icon {
     width: 1.8rem;
     height: 1.8rem;
-    padding-bottom: 0.3rem;
+}
+
+#favouriteUnfilledIcon {
+    mask: url("../assets/images/favorite_border_black_18px.svg");
+    background: var(--color-main-text);
+    width: 18px;
+    height: 18px;
+    transition: 0.5s;
+}
+
+#favouriteFilledIcon {
+    mask: url("../assets/images/favorite_black_18px.svg");
+    background: var(--color-main-text);
+    width: 18px;
+    height: 18px;
+    transition: 0.5s;
 }
 
 #mainContent {
@@ -240,5 +299,21 @@ export default {
     align-items: center;
     column-gap: 0.4rem;
     margin: 1rem;
+}
+
+#airConditionerIcon {
+    mask: url("../assets/images/ac_unit_black_24px.svg");
+    background: var(--color-main-text);
+    width: 24px;
+    height: 24px;
+    transition: 0.5s;
+}
+
+#accessibleIcon {
+    mask: url("../assets/images/accessible_black_24px.svg");
+    background: var(--color-main-text);
+    width: 24px;
+    height: 24px;
+    transition: 0.5s;
 }
 </style>

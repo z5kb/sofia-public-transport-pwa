@@ -128,9 +128,13 @@ export default {
     height: 4rem;
     background: var(--color-neutral-200);
     user-select: none;
+
+    /* set borders & overlap them */
+    border: 1px solid var(--color-borders);
+    margin-top: -2px;
 }
 
-.changeTitle span {
+.changeTitle > span {
     text-align: center;
 }
 
@@ -138,5 +142,9 @@ export default {
     padding: 0 1rem 0 1rem;
     line-height: 1.5;
     background: var(--color-neutral-100);
+
+    /* set borders & overlap them */
+    border: 1px solid var(--color-borders);
+    margin-top: -1px;
 }
 </style>

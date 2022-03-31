@@ -1,21 +1,35 @@
 <template>
-    <div id="stopArea">
+    <div id="content">
         <div id="search">
-            <input v-model="stopCode">
-            <button id="searchButton" @click="renderData" type="button">Search</button>
+            <input v-model="stopCode" placeholder="Въведете номер на спирка..." autocomplete="off">
+            <button id="searchButton" @click="renderData()" type="button">
+                <div>
+                    <span id="searchIcon"></span>
+                    <a>ТЪРСЕНЕ</a>
+                </div>
+            </button>
         </div>
         <div id="stopHeader">
-            <a>{{ stopName }}</a>
-            <img alt="addStopToFavsIcon" v-if="!stopIsFav && stopIsFav !== null" @click="addStopToFavs()" class="icon" src="../assets/navigation-bar/favourite-heart@48x48.svg">
-            <img alt="removeStopFromFavsIcon" v-if="stopIsFav && stopIsFav !== null" @click="removeStopFromFavs()" class="icon" src="../assets/navigation-bar/alerts@48x48.svg">
+            <b id="stopName">{{ stopName }}</b>
+            <span id="favouriteUnfilledIcon" v-if="!stopIsFav && stopIsFav !== null" @click="addStopToFavs()"></span>
+            <span id="favouriteFilledIcon" v-if="stopIsFav && stopIsFav !== null" @click="removeStopFromFavs()"></span>
         </div>
-        <div id="stopMainContent">
+        <div id="mainContent">
             <div id="line" v-for="line in lines" :key="line.id">
-                <p>{{ line[0] }}</p>
+                <span class="lineName">{{ line['lineName'] }}</span>
                 <div id="lineTimes">
-                    <div v-for="lineTime in line[1]" :key="lineTime.id">
+                    <div id="firstLineTime" >
+                        {{ line['firstLineTime'] }}
+                    </div>
+                    <div v-for="lineTime in line['lineTimes']" :key="lineTime.id">
                         {{ lineTime }}
                     </div>
+                </div>
+                <div id="busProperties">
+                    <span id="airConditionerIcon" v-if="line['hasAc'] === true"></span>
+                    <div v-else class="icon"></div>
+                    <span id="accessibleIcon" v-if="line['hasPlatform'] === true"></span>
+                    <div v-else class="icon"></div>
                 </div>
             </div>
         </div>
@@ -23,6 +37,7 @@
 </template>
 
 <script>
+// an IndexedDB library
 import Localbase from "localbase"
 
 export default {
@@ -48,7 +63,7 @@ export default {
     },
     methods: {
         renderData: function () {
-            this.getDataFromAPI(this.stopCode).then(response => response.json()).then(data => {
+            this.getDataFromAPI().then(data => {
                 // clear any rendered lines
                 this.lines = []
 
@@ -59,6 +74,8 @@ export default {
                 // iterate the data from the API and make a nested array with the names and the times of the lines
                 for (let i = 0; i < data["lines"].length; i++) {
                     let lineName = data["lines"][i]["name"]
+                    let hasAc = data["lines"][i]["times"][0]["hasAc"]
+                    let hasPlatform = data["lines"][i]["times"][0]["hasPlatform"]
                     let lineTimes = []
 
                     // limit the lines' times to 5 (so they render properly on the screen)
@@ -72,15 +89,17 @@ export default {
                         }
                     }
 
-                    // add spaces so the names are aligned properly on the html page
-                    if (lineName.length === 1) {
-                        lineName = "  " + lineName
-                    } else if (lineName.length === 2) {
-                        lineName = " " + lineName
-                    }
+                    // get the first line time
+                    let firstLineTime = lineTimes.shift()
 
                     // append current line to the "lines" array
-                    this.lines[i] = [lineName, lineTimes]
+                    this.lines[i] = {
+                        "lineName": lineName,
+                        "firstLineTime": firstLineTime,
+                        "lineTimes": lineTimes,
+                        "hasAc": hasAc,
+                        "hasPlatform": hasPlatform,
+                    }
                 }
             })
         },
@@ -90,10 +109,7 @@ export default {
                 "x-api-key": "fudeqogehuxazisaqubojawerulaciquxofilibupetirimu",
                 "x-user-id": "0c8ceb98-aea8-4f47-8fb1-cc5c63abf379",
             }
-
-            return fetch(url, {headers})
-                .then(response => response)
-                .then(data => data);
+            return fetch(url, {headers}).then(response => response.json())
         },
         addStopToFavs: function () {
             this.db.collection("FavouriteStops").add({
@@ -116,6 +132,9 @@ export default {
                         return
                     }
                 }
+                if (this.stopIsFav === null && this.stopCode === null) {
+                    return
+                }
                 this.stopIsFav = false
             })
         },
@@ -124,7 +143,9 @@ export default {
 </script>
 
 <style scoped>
-#stopArea {
+@import "../assets/colors.css";
+
+#content {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -132,48 +153,167 @@ export default {
 
 #search {
     display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    row-gap: 0.8rem;
+    width: 80%;
+    max-width: 25rem;
+    border-radius: 0.3rem;
+}
+
+#searchButton {
+    height: 36px;
+    width: 100%;
+    max-width: 30rem;
+    padding: 0 16px 0 12px;
+    margin: 0;
+    border: 0;
+    border-radius: 5px;
+    background: var(--color-accent-900);
+
+    box-shadow: 0 3px 5px rgb(11, 25, 47, 0.2);
+}
+
+#searchButton > div {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    column-gap: 8px;
+    justify-content: center;
     align-items: center;
 }
 
-#search button {
-    width: 4rem;
-    height: 1.3rem;
+#searchButton > div > a {
+    color: var(--color-search-button);
+    font-size: 15px;
+    letter-spacing: 1px;
+    transition: 0.5s;
+}
+
+#searchIcon {
+    mask: url("../assets/images/search_black_18px.svg");
+    background: var(--color-search-button);
+    width: 18px;
+    height: 18px;
+    transition: 0.5s;
+}
+
+#search > input {
+    color: var(--color-main-text);
+    height: 40px;
+    width: 100%;
+    text-align: center;
+    font-size: 20px;
+    border: 0;
+    border-bottom: 2px solid var(--color-main-text);
+    padding: 0;
+    margin: 0;
+    background: 0;
+    transition: 0.5s;
+}
+
+::placeholder {
+    color: var(--color-placeholder);
+}
+
+#search > input:focus {
+    outline: none;
 }
 
 #stopHeader {
     display: flex;
-    font-size: 20px;
     align-items: center;
     justify-content: center;
+    column-gap: 1rem;
+    height: 3rem;
+    margin: 0.6rem 0 0.6rem 0;
+}
+
+#stopName {
+    font-size: 20px;
+    text-align: center;
 }
 
 .icon {
-    width: 1rem;
-    height: 1rem;
-    padding: 1rem;
+    width: 1.8rem;
+    height: 1.8rem;
 }
 
-#stopMainContent {
+#favouriteUnfilledIcon {
+    mask: url("../assets/images/favorite_border_black_18px.svg");
+    background: var(--color-main-text);
+    width: 18px;
+    height: 18px;
+    transition: 0.5s;
+}
+
+#favouriteFilledIcon {
+    mask: url("../assets/images/favorite_black_18px.svg");
+    background: var(--color-main-text);
+    width: 18px;
+    height: 18px;
+    transition: 0.5s;
+}
+
+#mainContent {
     display: flex;
     flex-direction: column;
+    row-gap: 0.6rem;
 }
 
 #line {
     display: flex;
     align-items: center;
-    column-gap: 1rem;
+    justify-content: space-between;
     width: 97vw;
-    background: grey
+    max-width: 25rem;
+    height: 5rem;
+    background: var(--color-neutral-200);
 }
 
-#line p {
-    font-size: 2rem;
+.lineName {
+    text-align: center;
+    width: 9rem;
+    font-size: 30px;
     font-weight: bold;
-    margin: 1rem 1rem 1rem 1rem
+}
+
+#firstLineTime {
+    width: 100%;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
 }
 
 #lineTimes {
     display: flex;
     column-gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+#busProperties {
+    display: flex;
+    align-items: center;
+    column-gap: 0.4rem;
+    margin: 1rem;
+}
+
+#airConditionerIcon {
+    mask: url("../assets/images/ac_unit_black_24px.svg");
+    background: var(--color-main-text);
+    width: 24px;
+    height: 24px;
+    transition: 0.5s;
+}
+
+#accessibleIcon {
+    mask: url("../assets/images/accessible_black_24px.svg");
+    background: var(--color-main-text);
+    width: 24px;
+    height: 24px;
+    transition: 0.5s;
 }
 </style>
